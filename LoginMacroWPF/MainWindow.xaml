@@ -79,7 +79,8 @@
                 <TextBlock Text="Server:" Grid.Row="3" HorizontalAlignment="Right" Margin="0 0 5 0"/>
                 <ComboBox ItemsSource="{Binding ServerStrings}" SelectedIndex="{Binding SelectedIndex}" Grid.Column="1" Grid.Row="3"/>
 
-                <TextBlock Text="Login password:" Grid.Row="4" HorizontalAlignment="Right" Margin="0 0 5 0"/>
+                <Button Command="{Binding CopyPassword}" Content="Copy Password" Grid.Row="4" Width="auto" HorizontalAlignment="Left"/>
+                <TextBlock Text="Login password:" Grid.Row="4" HorizontalAlignment="Right" Margin="0 0 5 0" Width="auto"/>
                 <components:BindablePasswordBox Password="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Grid.Row="4"/>
 
                 <StackPanel Grid.Row="5" Grid.ColumnSpan="2" >

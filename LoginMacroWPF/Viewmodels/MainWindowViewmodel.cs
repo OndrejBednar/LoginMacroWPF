@@ -8,7 +8,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Windows.Input;
+using System.Windows;
 using UWPBindingCollection.ViewModels;
 using static LoginMacroWPF.PassManager;
 
@@ -43,10 +43,11 @@ namespace LoginMacroWPF.Viewmodels
         public Summoner SelectedSummoner { get { return _selectedSummoner; } set { _selectedSummoner = value; NotifyPropertyChanged(); } }
         public ObservableCollection<Summoner> SelectedServer { get { return _selectedServer; } set { _selectedServer = value; NotifyPropertyChanged(); } }
         public ObservableDictionary<string, ObservableCollection<Summoner>> Servers { get { return _servers; } set { _servers = value; NotifyPropertyChanged(); } }
-         
+
         public RelayCommand Login { get; set; }
         public RelayCommand EditLogin { get; set; }
         public RelayCommand AddAccount { get; set; }
+        public RelayCommand CopyPassword { get; set; }
         public MainWindowViewmodel()
         {
             ServerStrings = Enum.GetValues(typeof(Servers)).Cast<Servers>().ToList();
@@ -87,7 +88,7 @@ namespace LoginMacroWPF.Viewmodels
                     Summoner sum = new Summoner(new string[] { "\tAccountName:" + AccName, "\tServer:" + ServerStrings[SelectedIndex], "\tusername:" + Username, "\tpass:" + Encrypt(Password) });
                     if (Servers.ContainsKey(ServerStrings[SelectedIndex].ToString().ToUpper()))
                     {
-                    Servers.Where(ser => ser.Key == ServerStrings[SelectedIndex].ToString().ToUpper()).First().Value.Add(sum);
+                        Servers.Where(ser => ser.Key == ServerStrings[SelectedIndex].ToString().ToUpper()).First().Value.Add(sum);
                     }
                     else { Servers.Add(ServerStrings[SelectedIndex].ToString().ToUpper(), new ObservableCollection<Summoner>() { sum }); }
                     credentials.CreateLogin(sum);
@@ -100,6 +101,12 @@ namespace LoginMacroWPF.Viewmodels
                         $"\tusername:{Username}{Environment.NewLine}" +
                         $"\tpass:{Encrypt(Password)}{Environment.NewLine}" +
                         $"}}{Environment.NewLine}");
+                },
+                () => true);
+            CopyPassword = new RelayCommand(
+                () =>
+                {
+                    Clipboard.SetText(Password);
                 },
                 () => true);
         }
@@ -115,7 +122,7 @@ namespace LoginMacroWPF.Viewmodels
             AccName = SelectedSummoner.AccountName;
             Username = SelectedSummoner.Credentials[2].Split(':')[1];
             Password = Decrypt(SelectedSummoner.Credentials[3].Split(':')[1]);
-            SelectedIndex = ((int)SelectedSummoner.Server);
+            SelectedIndex = (int)SelectedSummoner.Server;
         }
 
     }

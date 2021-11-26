@@ -31,8 +31,7 @@ namespace LoginMacroWPF.Services
             {
                 if (Environment.CurrentDirectory != @"C:\Windows\System32")
                 {
-                    Debug.WriteLine("exception: " + ex);
-                    File.AppendAllText("C:\\Users\\Ondra-PC\\source\\repos\\LoginMacroWPF\\LoginMacroWPF\\bin\\Debug" + "/debug.log", ex.ToString());
+                    File.AppendAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "repos", "LoginMacroWPF") + "/debug.log", ex.ToString());
                     MessageBox.Show("You dont have any accounts saved yet");
                 }
             }

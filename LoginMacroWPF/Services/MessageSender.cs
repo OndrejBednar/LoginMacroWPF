@@ -1,6 +1,7 @@
 ﻿using LoginMacroWPF.Models;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ namespace LoginMacroWPF.Services
     {
         public MessageSender()
         {
+            Startup();
             Task.Factory.StartNew(Startup);
         }
 
@@ -52,11 +54,19 @@ namespace LoginMacroWPF.Services
         DateTime controlTime;
         public void Startup()
         {
+            if (Environment.CurrentDirectory != @"C:\Windows\System32")
+            {
+                return;
+            }
             //find if the laucher is already opened
             if (Process.GetProcessesByName("RiotClientUx").FirstOrDefault() == null)
             {
                 controlTime = DateTime.Now;
                 //if not then start it && wait for it to be idle
+                if (!File.Exists(@"C:\Riot Games\League of Legends\LeagueClient.exe"))
+                {
+                    MessageBox.Show("Theres no league of legends installed !");
+                }
                 Process.Start(@"C:\Riot Games\League of Legends\LeagueClient.exe");
                 while (Process.GetProcessesByName("RiotClientUx").FirstOrDefault() == null || Process.GetProcessesByName("RiotClientUx").FirstOrDefault().MainWindowHandle.ToInt32() == 0)
                 {
