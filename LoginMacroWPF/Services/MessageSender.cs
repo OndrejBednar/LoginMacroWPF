@@ -54,7 +54,7 @@ namespace LoginMacroWPF.Services
         DateTime controlTime;
         public void Startup()
         {
-            if (Environment.CurrentDirectory != @"C:\Windows\System32")
+            if (Environment.CurrentDirectory == @"C:\Windows\system32")
             {
                 return;
             }
@@ -62,11 +62,13 @@ namespace LoginMacroWPF.Services
             if (Process.GetProcessesByName("RiotClientUx").FirstOrDefault() == null)
             {
                 controlTime = DateTime.Now;
-                //if not then start it && wait for it to be idle
                 if (!File.Exists(@"C:\Riot Games\League of Legends\LeagueClient.exe"))
                 {
                     MessageBox.Show("Theres no league of legends installed !");
+                    return;
                 }
+
+                //if not then start it && wait for it to be idle
                 Process.Start(@"C:\Riot Games\League of Legends\LeagueClient.exe");
                 while (Process.GetProcessesByName("RiotClientUx").FirstOrDefault() == null || Process.GetProcessesByName("RiotClientUx").FirstOrDefault().MainWindowHandle.ToInt32() == 0)
                 {

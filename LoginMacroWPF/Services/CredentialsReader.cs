@@ -29,10 +29,10 @@ namespace LoginMacroWPF.Services
             }
             catch (Exception ex)
             {
-                if (Environment.CurrentDirectory != @"C:\Windows\System32")
+                if (Environment.CurrentDirectory != @"C:\Windows\system32")
                 {
-                    File.AppendAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "repos", "LoginMacroWPF") + "/debug.log", ex.ToString());
-                    MessageBox.Show("You dont have any accounts saved yet");
+                    File.AppendAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "source", "repos", "LoginMacroWPF") + "/debug.log", ex.ToString());
+                    MessageBox.Show($"You dont have any accounts saved yet {Environment.NewLine} {Environment.CurrentDirectory}");
                 }
             }
 
