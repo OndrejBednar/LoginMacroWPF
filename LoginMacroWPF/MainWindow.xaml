@@ -46,7 +46,7 @@
                          SelectionChanged="Accounts_SelectionChanged">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding AccountName}" Margin="0 5"/>
+                            <TextBlock Text="{Binding VisibleText}" Margin="0 5"/>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>

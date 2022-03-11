@@ -21,7 +21,7 @@ namespace LoginMacroWPF.Viewmodels
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-        private readonly string path = $"{Environment.CurrentDirectory}/pwd.pwd";
+        private readonly string path = $"{Environment.CurrentDirectory}/.pwd";
         private string _username, _accName, _password;
         private List<Servers> _serverStrings = new List<Servers>();
         private int _selectedIndex = 1;

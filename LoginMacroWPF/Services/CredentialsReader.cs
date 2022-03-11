@@ -1,9 +1,11 @@
 ﻿using LoginMacroWPF.Components;
 using LoginMacroWPF.Models;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -14,28 +16,66 @@ namespace LoginMacroWPF.Services
     {
         private List<Summoner> Accounts = new List<Summoner>();
         private string[] loginCredentials;
-
+        private string checkErrors = "";
         public CredentialsReader(string path)
         {
             //reading all the credentials from our file
+            loginCredentials = File.ReadAllText(path).Split('{', '}').Where((item, index) => index % 2 != 0).ToArray(); //regex equivalent /\{([^}]*)\}/g
+
+
+            ChromeDriverService chromeDriverService;
+            try { chromeDriverService = ChromeDriverService.CreateDefaultService(); chromeDriverService.HideCommandPromptWindow = true; }
+            catch (Exception)
+            {
+                ChromeDriverInstaller.Install();
+                chromeDriverService = ChromeDriverService.CreateDefaultService();
+                chromeDriverService.HideCommandPromptWindow = true;
+            }
+
+            ChromeOptions options = new ChromeOptions();
+            options.AddArguments(new List<string>() { $"--headless" });
+            IWebDriver Chrome = new ChromeDriver(chromeDriverService, options);
+            WebDriverWait Wait = new WebDriverWait(Chrome, TimeSpan.FromSeconds(30))
+            {
+                PollingInterval = TimeSpan.FromSeconds(5)
+            };
+            Wait.IgnoreExceptionTypes(typeof(NoSuchElementException));
+
             try
             {
-                loginCredentials = File.ReadAllText(path).Split('{', '}').Where((item, index) => index % 2 != 0).ToArray(); //regex equivalent /\{([^}]*)\}/g
-
                 foreach (var login in loginCredentials)
                 {
-                    Accounts.Add(new Summoner(login.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)));
+                    var sum = new Summoner(login.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries));
+                    try
+                    {
+                        Chrome.Url = $"https://{sum.Server.ToString().ToLower()}.op.gg/summoners/{sum.Server.ToString().ToLower()}/{sum.AccountName}";
+                        Chrome.Navigate();
+
+                        var divisions = Chrome.FindElements(By.CssSelector(".wrapper .info"));
+                        sum.SoloQ = divisions[0].FindElements(By.TagName("div"))[1].Text;
+                        sum.FlexQ = divisions[1].FindElements(By.TagName("div"))[1].Text;
+                    }
+                    catch (Exception)
+                    {
+                        checkErrors += sum.AccountName + Environment.NewLine;
+                        sum.SoloQ = "Error";
+                        sum.FlexQ = "Error";
+                    }
+                    Accounts.Add(sum);
                 }
             }
             catch (Exception ex)
             {
                 if (Environment.CurrentDirectory != @"C:\Windows\system32")
                 {
-                    File.AppendAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "source", "repos", "LoginMacroWPF") + "/debug.log", ex.ToString());
+                    File.AppendAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "source", "repos", "_Github_PrivateProjects", "LoginMacroWPF") + "/debug.log", ex.ToString());
                     MessageBox.Show($"You dont have any accounts saved yet {Environment.NewLine} {Environment.CurrentDirectory}");
                 }
             }
-
+            if (checkErrors != "")
+            {
+                MessageBox.Show("There was an error with getting divisions for following accounts: " + Environment.NewLine + checkErrors);
+            }
         }
 
         public void CreateServerLogins(ObservableDictionary<string, ObservableCollection<Summoner>> collection)

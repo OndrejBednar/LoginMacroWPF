@@ -22,7 +22,16 @@ namespace LoginMacroWPF.Models
                 return (Servers)Enum.Parse(typeof(Servers),Credentials[1].Split(':')[1]);
             }
         }
+        public string SoloQ { get; set; }
+        public string FlexQ { get; set; }
         public string[] Credentials { get; set; }
+        public string VisibleText
+        {
+            get
+            {
+                return $"{AccountName} S: {SoloQ} F: {FlexQ}";
+            }
+        }
 
         public Summoner(string[] credentials)
         {
