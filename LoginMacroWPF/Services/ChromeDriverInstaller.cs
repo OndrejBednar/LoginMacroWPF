@@ -30,8 +30,7 @@ namespace LoginMacroWPF.Services
         {
             new DriverManager().SetUpDriver(
                 $"https://chromedriver.storage.googleapis.com/{GetChromeVersion()}/chromedriver_win32.zip",
-                Path.Combine(Directory.GetCurrentDirectory(), "chromedriver.exe"),
-                "chromedriver.exe"
+                Path.Combine(Directory.GetCurrentDirectory(), "chromedriver.exe")
             );
         }
     }

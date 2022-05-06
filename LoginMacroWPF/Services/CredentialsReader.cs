@@ -24,17 +24,18 @@ namespace LoginMacroWPF.Services
 
 
             ChromeDriverService chromeDriverService;
-            try { chromeDriverService = ChromeDriverService.CreateDefaultService(); chromeDriverService.HideCommandPromptWindow = true; }
+            ChromeOptions options = new ChromeOptions();
+            options.AddArguments(new List<string>() { $"--headless" });
+            IWebDriver Chrome;
+            try { chromeDriverService = ChromeDriverService.CreateDefaultService(); chromeDriverService.HideCommandPromptWindow = true; Chrome = new ChromeDriver(chromeDriverService, options); }
             catch (Exception)
             {
                 ChromeDriverInstaller.Install();
                 chromeDriverService = ChromeDriverService.CreateDefaultService();
                 chromeDriverService.HideCommandPromptWindow = true;
+                Chrome = new ChromeDriver(chromeDriverService, options);
             }
 
-            ChromeOptions options = new ChromeOptions();
-            options.AddArguments(new List<string>() { $"--headless" });
-            IWebDriver Chrome = new ChromeDriver(chromeDriverService, options);
             WebDriverWait Wait = new WebDriverWait(Chrome, TimeSpan.FromSeconds(30))
             {
                 PollingInterval = TimeSpan.FromSeconds(5)
@@ -51,11 +52,21 @@ namespace LoginMacroWPF.Services
                         Chrome.Url = $"https://{sum.Server.ToString().ToLower()}.op.gg/summoners/{sum.Server.ToString().ToLower()}/{sum.AccountName}";
                         Chrome.Navigate();
 
-                        var divisions = Chrome.FindElements(By.CssSelector(".wrapper .info"));
-                        sum.SoloQ = divisions[0].FindElements(By.TagName("div"))[1].Text;
-                        sum.FlexQ = divisions[1].FindElements(By.TagName("div"))[1].Text;
+                        var unrankedCheck = Chrome.FindElements(By.CssSelector("#content-container .header"));
+                        var divisions = Chrome.FindElements(By.CssSelector(".content .info"));
+                        var s = unrankedCheck[0].FindElements(By.ClassName("unranked"));
+                        var b = unrankedCheck[0].FindElements(By.TagName("span"));
+                        if (unrankedCheck[0].FindElements(By.TagName("span")).Count == 0)
+                        {
+                            sum.SoloQ = divisions[0].FindElements(By.TagName("div"))[0].Text;
+                        }
+                        if (unrankedCheck[1].FindElements(By.TagName("span")).Count == 0)
+                        {
+                            if (sum.SoloQ == "Unranked") sum.FlexQ = divisions[0].FindElements(By.TagName("div"))[0].Text;
+                            else { sum.FlexQ = divisions[1].FindElements(By.TagName("div"))[0].Text; }
+                        }
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
                         checkErrors += sum.AccountName + Environment.NewLine;
                         sum.SoloQ = "Error";
