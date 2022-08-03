@@ -240,12 +240,21 @@
     <Compile Include="Helpers\PassManager.cs" />
     <Compile Include="Helpers\ScreenCapture.cs" />
     <Compile Include="Components\ObservableDictionary.cs" />
+    <Compile Include="LeaguePage.xaml.cs">
+      <DependentUpon>LeaguePage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Models\IAccount.cs" />
+    <Compile Include="Models\Platforms.cs" />
     <Compile Include="Models\Servers.cs" />
+    <Compile Include="Models\SteamAcc.cs" />
     <Compile Include="Models\Summoner.cs" />
     <Compile Include="Services\ChromeDriverInstaller.cs" />
-    <Compile Include="Services\CredentialsReader.cs" />
+    <Compile Include="Services\CredentialsRW.cs" />
     <Compile Include="Services\MessageSender.cs" />
     <Compile Include="Services\RiotAPI.cs" />
+    <Compile Include="SteamPage.xaml.cs">
+      <DependentUpon>SteamPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Themes\ColourfulDarkTheme.xaml.cs">
       <DependentUpon>ColourfulDarkTheme.xaml</DependentUpon>
     </Compile>
@@ -259,9 +268,14 @@
       <DependentUpon>LightTheme.xaml</DependentUpon>
     </Compile>
     <Compile Include="Themes\ThemesController.cs" />
-    <Compile Include="Viewmodels\MainWindowViewmodel.cs" />
+    <Compile Include="Viewmodels\LeaguePageViewmodel.cs" />
     <Compile Include="Viewmodels\RelayCommand.cs" />
+    <Compile Include="Viewmodels\SteamPageViewmodel.cs" />
     <Page Include="Components\BindablePasswordBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LeaguePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -277,6 +291,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="SteamPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Themes\ColourfulDarkTheme.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

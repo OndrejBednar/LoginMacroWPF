@@ -15,33 +15,19 @@ namespace LoginMacroWPF
         {
             InitializeComponent();
 
+            PlatformFrame.NavigationUIVisibility = System.Windows.Navigation.NavigationUIVisibility.Hidden;
             //if (RiotAPI.Api == null) InvalidApiKey.Visible = true;
         }
 
 
-        
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void LeagueClicked(object sender, RoutedEventArgs e)
         {
-            Accounts.Visibility = Visibility.Hidden;
-            ServerSelect.Visibility = Visibility.Visible;
-            ReturnBtn.Visibility = Visibility.Hidden;
+            PlatformFrame.Navigate(new System.Uri("LeaguePage.xaml", System.UriKind.RelativeOrAbsolute));
         }
 
-        private void ListViewItem_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void SteamClicked(object sender, RoutedEventArgs e)
         {
-            ((MainWindowViewmodel)DataContext).SelectedServer = ((System.Collections.Generic.KeyValuePair<string, System.Collections.ObjectModel.ObservableCollection<Models.Summoner>>)((ListBoxItem)sender).Content).Value;
-            Accounts.ItemsSource = ((MainWindowViewmodel)DataContext).GetSummoners();
-            Accounts.Visibility = Visibility.Visible;
-            ServerSelect.Visibility = Visibility.Hidden;
-            ReturnBtn.Visibility = Visibility.Visible;
-        }
-
-        private void Accounts_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (Accounts.SelectedItem != null)
-            ((MainWindowViewmodel)DataContext).SummonerSelected();
-            EditBtn.IsEnabled = true;
-            LoginBtn.IsEnabled = true;
+            PlatformFrame.Navigate(new System.Uri("SteamPage.xaml", System.UriKind.RelativeOrAbsolute));
         }
     }
 }

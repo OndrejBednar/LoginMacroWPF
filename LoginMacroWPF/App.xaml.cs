@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LoginMacroWPF.Services;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -13,5 +14,16 @@ namespace LoginMacroWPF
     /// </summary>
     public partial class App : Application
     {
+        private readonly string path = $"{Environment.CurrentDirectory}/.pwd";
+        public static CredentialsRW CredentialRW { get; set; }
+        private void Application_Startup(object sender, StartupEventArgs e)
+        {
+            CredentialRW = new CredentialsRW(path);
+        }
+        private void Application_Exit(object sender, ExitEventArgs e)
+        {
+
+        }
+
     }
 }

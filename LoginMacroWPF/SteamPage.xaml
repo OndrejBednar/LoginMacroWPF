@@ -1,0 +1,70 @@
+﻿<Page x:Class="LoginMacroWPF.SteamPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:LoginMacroWPF"
+      xmlns:viewmodels="clr-namespace:LoginMacroWPF.Viewmodels" 
+      xmlns:components="clr-namespace:LoginMacroWPF.Components"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="SteamPage">
+
+    <Page.DataContext>
+        <viewmodels:SteamPageViewmodel/>
+    </Page.DataContext>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <DockPanel Margin="5 0">
+            <ListBox x:Name="Accounts" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                         SelectedItem="{Binding SelectedAccount}"
+                         ItemsSource="{Binding Accounts}"
+                         SelectionChanged="Accounts_SelectionChanged">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding VisibleText}" Margin="0 5"/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+        </DockPanel>
+        <StackPanel Grid.Column="1" Margin="5 0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="Account name:" Grid.Row="1" HorizontalAlignment="Right" Margin="0 0 5 0"/>
+                <TextBox Text="{Binding AccName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Grid.Row="1"/>
+
+                <TextBlock Text="Login username:" Grid.Row="2" HorizontalAlignment="Right" Margin="0 0 5 0"/>
+                <TextBox Text="{Binding Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Grid.Row="2"/>
+
+                <Button Command="{Binding CopyPassword}" Content="Copy Password" Grid.Row="4" Width="auto" HorizontalAlignment="Left"/>
+                <TextBlock Text="Login password:" Grid.Row="4" HorizontalAlignment="Right" Margin="0 0 5 0" Width="auto"/>
+                <components:BindablePasswordBox Password="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Grid.Row="4"/>
+
+                <StackPanel Grid.Row="5" Grid.ColumnSpan="2" >
+                    <Button x:Name="LoginBtn" Content="Login" Command="{Binding Login}" IsEnabled="False" Margin="0 5" Padding="0 5"/>
+                    <Button x:Name="EditBtn" Content="Edit login" Command="{Binding EditLogin}" IsEnabled="False" Margin="0 0 0 5"/>
+                    <Button Content="Add account" Command="{Binding AddAccount}" Margin="0 0 0 5"/>
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+
+    </Grid>
+</Page>

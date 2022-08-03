@@ -13,47 +13,64 @@ namespace LoginMacroWPF.Services
 {
     public class MessageSender
     {
-        public MessageSender()
-        {
-            Startup();
-            Task.Factory.StartNew(Startup);
-        }
-
         private const int MOUSEEVENTF_LEFTDOWN = 0x02;
         private const int MOUSEEVENTF_LEFTUP = 0x04;
 
-        public void DoMouseClick(int x, int y)
+        public static void DoMouseClick()
         {
-            SetCursorPos(x, y);
             //perform click            
             mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
             mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
         }
-
-        private IntPtr ClientPtr { get; set; }
-
-        public void Login(Summoner summoner, bool isError)
+        public static void DoMouseDoubleClick()
         {
+            //perform click            
+            mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
+            mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+            mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
+            mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+        }
+
+
+        public static void Login(Summoner summoner, bool isError)
+        {
+            IntPtr ClientPtr;
             ClientPtr = Process.GetProcessesByName("RiotClientUx").FirstOrDefault().MainWindowHandle;
             var rect = new Rect();
             GetWindowRect(ClientPtr, ref rect);
             SetForegroundWindow(ClientPtr);
             Thread.Sleep(TimeSpan.FromSeconds(0.5));
-            DoMouseClick((int)((rect.Right * 0.5) + (rect.Left * 0.5)), (int)((rect.Bottom * 0.5) + (rect.Top * 0.5)));
+            SetCursorPos((int)((rect.Right * 0.5) + (rect.Left * 0.5)), (int)((rect.Bottom * 0.3) + (rect.Top * 0.7)));
+            DoMouseClick();
             SendKeys.SendWait("{TAB}");
             if (isError)
             {
                 SendKeys.SendWait("{TAB}");
                 SendKeys.SendWait("{TAB}");
             }
-            SendKeys.SendWait($"{summoner.Credentials[2].Split(':')[1]}");
+            SendKeys.SendWait($"{summoner.Username}");
             SendKeys.SendWait("{TAB}");
-            SendKeys.SendWait($"{Decrypt(summoner.Credentials[3].Split(':')[1])}");
+            SendKeys.SendWait($"{Decrypt(summoner.Password)}");
             SendKeys.SendWait("{ENTER}");
         }
-        DateTime controlTime;
-        public void Startup()
+        public static void Login(SteamAcc acc)
         {
+            IntPtr ClientPtr;
+            ClientPtr = Process.GetProcessesByName("Steam").FirstOrDefault().MainWindowHandle;
+            var rect = new Rect();
+            GetWindowRect(ClientPtr, ref rect);
+            SetForegroundWindow(ClientPtr);
+            Thread.Sleep(TimeSpan.FromSeconds(0.5));
+            SetCursorPos((int)((rect.Right * 0.5) + (rect.Left * 0.5)), (int)((rect.Bottom * 0.3) + (rect.Top * 0.7)));
+            DoMouseDoubleClick();
+            Thread.Sleep(TimeSpan.FromSeconds(0.5));
+            SendKeys.SendWait($"{acc.Username}");
+            SendKeys.SendWait("{TAB}");
+            SendKeys.SendWait($"{Decrypt(acc.Password)}");
+        }
+        public static void Startup()
+        {
+            DateTime controlTime;
             if (Environment.CurrentDirectory == @"C:\Windows\system32")
             {
                 return;

@@ -9,87 +9,19 @@
         Title="MainWindow" Height="450" Width="800"
         Style="{DynamicResource CustomWindowStyle}">
 
-    <Window.DataContext>
-        <viewmodels:MainWindowViewmodel/>
-    </Window.DataContext>
+
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-
-        <DockPanel Margin="5 0">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="30"/>
-                </Grid.RowDefinitions>
-                <StackPanel x:Name="ServerSelect" Grid.RowSpan="2">
-                    <TextBlock Text="Select server" HorizontalAlignment="Center"/>
-                    <ListBox ItemsSource="{Binding Servers}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" 
-                             SelectedItem="{Binding SelectedServer, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Path=Key}"/>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                        <ListBox.ItemContainerStyle>
-                            <Style TargetType="ListBoxItem">
-                                <EventSetter Event="PreviewMouseLeftButtonDown" Handler="ListViewItem_PreviewMouseLeftButtonDown"/>
-                            </Style>
-                        </ListBox.ItemContainerStyle>
-                    </ListBox>
-                </StackPanel>
-
-                <ListBox x:Name="Accounts" Visibility="Hidden" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                         SelectedItem="{Binding SelectedSummoner}"
-                         SelectionChanged="Accounts_SelectionChanged">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding VisibleText}" Margin="0 5"/>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-                
-                <Button x:Name="ReturnBtn" Grid.Row="1" Content="Back to server list" Click="Button_Click" Visibility="Hidden"/>
-            </Grid>
-        </DockPanel>
-        <StackPanel Grid.Column="1" Margin="5 0">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                
-                <TextBlock Text="Account name:" Grid.Row="1" HorizontalAlignment="Right" Margin="0 0 5 0"/>
-                <TextBox Text="{Binding AccName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Grid.Row="1"/>
-                
-                <TextBlock Text="Login username:" Grid.Row="2" HorizontalAlignment="Right" Margin="0 0 5 0"/>
-                <TextBox Text="{Binding Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Grid.Row="2"/>
-                
-                <TextBlock Text="Server:" Grid.Row="3" HorizontalAlignment="Right" Margin="0 0 5 0"/>
-                <ComboBox ItemsSource="{Binding ServerStrings}" SelectedIndex="{Binding SelectedIndex}" Grid.Column="1" Grid.Row="3"/>
-
-                <Button Command="{Binding CopyPassword}" Content="Copy Password" Grid.Row="4" Width="auto" HorizontalAlignment="Left"/>
-                <TextBlock Text="Login password:" Grid.Row="4" HorizontalAlignment="Right" Margin="0 0 5 0" Width="auto"/>
-                <components:BindablePasswordBox Password="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Grid.Row="4"/>
-
-                <StackPanel Grid.Row="5" Grid.ColumnSpan="2" >
-                    <Button x:Name="LoginBtn" Content="Login" Command="{Binding Login}" IsEnabled="False" Margin="0 5" Padding="0 5"/>
-                    <Button x:Name="EditBtn" Content="Edit login" Command="{Binding EditLogin}" IsEnabled="False" Margin="0 0 0 5"/>
-                    <Button Content="Add account" Command="{Binding AddAccount}" Margin="0 0 0 5"/>
-                </StackPanel>
-            <CheckBox IsChecked="{Binding IsError, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Content="Is error present"/>
-            </Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <StackPanel x:Name="PlatformSelect" Orientation="Vertical">
+            <TextBlock Text="Select platform to log in" HorizontalAlignment="Center"/>
+            <Button Content="League of Legends" Click="LeagueClicked"/>
+            <Button Content="Steam" Click="SteamClicked"/>
         </StackPanel>
+
+        <Frame x:Name="PlatformFrame" Grid.Row="2"/>
+
     </Grid>
 </Window>

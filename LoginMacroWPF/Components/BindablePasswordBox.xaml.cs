@@ -38,7 +38,6 @@ namespace LoginMacroWPF.Components
         {
             _passwordChanging = true;
             Password = passwordBox.Password;
-            Debug.WriteLine(Password);
             _passwordChanging = false;
         }
         private void UpdatePassword()
