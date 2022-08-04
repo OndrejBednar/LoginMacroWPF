@@ -1,4 +1,7 @@
-﻿using System.IO;
+﻿using Microsoft.Win32;
+using System;
+using System.Diagnostics;
+using System.IO;
 using System.Net;
 using WebDriverManager;
 
@@ -8,9 +11,9 @@ namespace LoginMacroWPF.Services
     {
         public static string GetChromeVersion()
         {
-            WebClient client = new WebClient();
-            string s = client.DownloadString("https://chromedriver.storage.googleapis.com/LATEST_RELEASE");
-            /*
+            //WebClient client = new WebClient();
+            //string s = client.DownloadString("https://chromedriver.storage.googleapis.com/LATEST_RELEASE");
+            
             string chromePath = (string)Registry.GetValue("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\chrome.exe", null, null);
             if (chromePath == null)
             {
@@ -19,12 +22,13 @@ namespace LoginMacroWPF.Services
 
             var fileVersionInfo = FileVersionInfo.GetVersionInfo(chromePath);
             return fileVersionInfo.FileVersion;
-        */
-            return s;
+        
+            //return s;
         }
 
         public static void Install()
         {
+            File.Delete("chromedriver.exe");
             new DriverManager().SetUpDriver(
                 $"https://chromedriver.storage.googleapis.com/{GetChromeVersion()}/chromedriver_win32.zip",
                 Path.Combine(Directory.GetCurrentDirectory(), "chromedriver.exe")

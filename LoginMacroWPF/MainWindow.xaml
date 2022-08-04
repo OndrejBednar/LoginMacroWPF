@@ -11,17 +11,18 @@
 
 
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="60"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <StackPanel x:Name="PlatformSelect" Orientation="Vertical">
-            <TextBlock Text="Select platform to log in" HorizontalAlignment="Center"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <StackPanel Name="rect" Width="100" VerticalAlignment="Stretch" Visibility="Collapsed">
             <Button Content="League of Legends" Click="LeagueClicked"/>
             <Button Content="Steam" Click="SteamClicked"/>
         </StackPanel>
+        <Button Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Width="32" Height="32" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Right" Background="Transparent" Click="Button_Click">&gt;</Button>
 
-        <Frame x:Name="PlatformFrame" Grid.Row="2"/>
+
+        <Frame x:Name="PlatformFrame" Grid.Column="1"/>
 
     </Grid>
 </Window>

@@ -6,6 +6,7 @@ using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -23,7 +24,6 @@ namespace LoginMacroWPF.Services
         {
             this.path = path;
             //reading all the credentials from our file
-            loginCredentials = File.ReadAllText(path).Split('{', '}').Where((item, index) => index % 2 != 0).ToArray(); //regex equivalent /\{([^}]*)\}/g
 
             ChromeDriverService chromeDriverService;
             ChromeOptions options = new ChromeOptions();
@@ -31,6 +31,11 @@ namespace LoginMacroWPF.Services
             try { chromeDriverService = ChromeDriverService.CreateDefaultService(); chromeDriverService.HideCommandPromptWindow = true; Chrome = new ChromeDriver(chromeDriverService, options); }
             catch (Exception)
             {
+                var processes = Process.GetProcesses().Where(p => p.ProcessName == "chromedriver");
+                foreach (var process in processes)
+                {
+                    process.Kill();
+                }
                 ChromeDriverInstaller.Install();
                 chromeDriverService = ChromeDriverService.CreateDefaultService();
                 chromeDriverService.HideCommandPromptWindow = true;
@@ -45,9 +50,10 @@ namespace LoginMacroWPF.Services
 
             try
             {
-                foreach (var loginCred in loginCredentials)
+                loginCredentials = File.ReadAllText(path).Split('{', '}').Where((item, index) => index % 2 != 0).ToArray(); //regex equivalent /\{([^}]*)\}/g
+                foreach (var account in loginCredentials)
                 {
-                    string[] login = loginCred.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                    string[] login = account.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
                     switch ((Platforms)Enum.Parse(typeof(Platforms), login[0]))
                     {
                         case Platforms.Lol:
@@ -70,8 +76,8 @@ namespace LoginMacroWPF.Services
             {
                 if (Environment.CurrentDirectory != @"C:\Windows\system32")
                 {
-                    File.AppendAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "source", "repos", "_Github_PrivateProjects", "LoginMacroWPF") + "/debug.log", ex.ToString());
-                    MessageBox.Show($"You dont have any accounts saved yet {Environment.NewLine} {Environment.CurrentDirectory}");
+                    File.AppendAllText(Directory.GetParent(Environment.CurrentDirectory).Parent.FullName + "/debug.log", ex.ToString());
+                    MessageBox.Show($"You dont have any accounts saved yet");
                 }
             }
         }
@@ -257,5 +263,11 @@ namespace LoginMacroWPF.Services
             }
 
         } //for all summoners at once
+
+        public void DisposeOfChromedriver()
+        {
+            Chrome.Close();
+            Chrome.Dispose();
+        } //freeing up memory before closing the program
     }
 }
