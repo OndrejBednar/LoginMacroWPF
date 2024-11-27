@@ -20,10 +20,6 @@ namespace LoginMacroWPF
         {
             CredentialRW = new CredentialsRW(path);
         }
-        private void Application_Exit(object sender, ExitEventArgs e)
-        {
-            CredentialRW.DisposeOfChromedriver();
-        }
 
     }
 }

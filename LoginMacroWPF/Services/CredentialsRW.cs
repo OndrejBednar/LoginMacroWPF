@@ -1,4 +1,6 @@
-﻿using LoginMacroWPF.Components;
+﻿using AngleSharp.Dom;
+using AngleSharp.Html.Parser;
+using LoginMacroWPF.Components;
 using LoginMacroWPF.Models;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
@@ -9,6 +11,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Windows;
 
 namespace LoginMacroWPF.Services
@@ -19,57 +22,32 @@ namespace LoginMacroWPF.Services
         private string[] loginCredentials;
         private string checkErrors = "";
         private string path;
-        IWebDriver Chrome;
         public CredentialsRW(string path)
         {
             this.path = path;
-            //reading all the credentials from our file
-
-            ChromeDriverService chromeDriverService;
-            ChromeOptions options = new ChromeOptions();
-            options.AddArguments(new List<string>() { $"--headless" });
-            try { chromeDriverService = ChromeDriverService.CreateDefaultService(); chromeDriverService.HideCommandPromptWindow = true; Chrome = new ChromeDriver(chromeDriverService, options); }
-            catch (Exception)
-            {
-                var processes = Process.GetProcesses().Where(p => p.ProcessName == "chromedriver");
-                foreach (var process in processes)
-                {
-                    process.Kill();
-                }
-                ChromeDriverInstaller.Install();
-                chromeDriverService = ChromeDriverService.CreateDefaultService();
-                chromeDriverService.HideCommandPromptWindow = true;
-                Chrome = new ChromeDriver(chromeDriverService, options);
-            }
-
-            WebDriverWait Wait = new WebDriverWait(Chrome, TimeSpan.FromSeconds(30))
-            {
-                PollingInterval = TimeSpan.FromSeconds(5)
-            };
-            Wait.IgnoreExceptionTypes(typeof(NoSuchElementException));
 
             try
             {
+                //reading all the credentials from our file
                 loginCredentials = File.ReadAllText(path).Split('{', '}').Where((item, index) => index % 2 != 0).ToArray(); //regex equivalent /\{([^}]*)\}/g
                 foreach (var account in loginCredentials)
                 {
                     string[] login = account.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                    IAccount acc = null;
                     switch ((Platforms)Enum.Parse(typeof(Platforms), login[0]))
                     {
                         case Platforms.Lol:
-                            var sum = new Summoner(login);
-                            Accounts.Add(sum);
+                            acc = new Summoner(login);
                             break;
                         case Platforms.Steam:
-                            var acc = new SteamAcc(login);
-                            Accounts.Add(acc);
+                            acc = new SteamAcc(login);
                             break;
                         case Platforms.BattleNet:
                             break;
                         default:
                             break;
                     }
-
+                    Accounts.Add(acc);
                 }
             }
             catch (Exception ex)
@@ -165,15 +143,23 @@ namespace LoginMacroWPF.Services
             checkErrors = "";
             try
             {
-                Chrome.Url = $"https://{sum.Server.ToString().ToLower()}.op.gg/summoners/{sum.Server.ToString().ToLower()}/{sum.AccountName}";
-                Chrome.Navigate();
+                var httpClient = new HttpClient();
+                var request = httpClient.GetAsync($"https://{sum.Server.ToString().ToLower()}.op.gg/summoners/{sum.Server.ToString().ToLower()}/{sum.AccountName}").Result;
+                using (var response = request.Content.ReadAsStreamAsync().Result)
+                {
+                    var parser = new HtmlParser();
+                    var document = parser.ParseDocument(response);
+                    var divisions = document.QuerySelector("#content-container").FirstChild.ChildNodes;
 
-                //not needed anymore
-                //var unrankedCheck = Chrome.FindElements(By.CssSelector(".wrapper"));
-                var divisions = Chrome.FindElements(By.CssSelector(".wrapper .info"));
-
-                sum.SoloQ = divisions[0].FindElements(By.TagName("div"))[1].Text;
-                sum.FlexQ = divisions[1].FindElements(By.TagName("div"))[1].Text;
+                    if (divisions[1].ChildNodes.Count() == 2)
+                        sum.SoloQ = divisions[1].LastChild.ChildNodes[1].FirstChild.TextContent.Trim();
+                    else { sum.SoloQ = "Unranked"; }
+                    sum.SoloQ = char.ToUpper(sum.SoloQ[0]) + sum.SoloQ.Substring(1);
+                    if (divisions[3].ChildNodes.Count() == 2)
+                        sum.FlexQ = divisions[3].LastChild.ChildNodes[1].FirstChild.TextContent.Trim();
+                    else { sum.FlexQ = "Unranked"; }
+                    sum.FlexQ = char.ToUpper(sum.FlexQ[0]) + sum.FlexQ.Substring(1);
+                }
             }
             catch (Exception)
             {
@@ -194,15 +180,23 @@ namespace LoginMacroWPF.Services
             {
                 try
                 {
-                    Chrome.Url = $"https://{sum.Server.ToString().ToLower()}.op.gg/summoners/{sum.Server.ToString().ToLower()}/{sum.AccountName}";
-                    Chrome.Navigate();
+                    var httpClient = new HttpClient();
+                    var request = httpClient.GetAsync($"https://{sum.Server.ToString().ToLower()}.op.gg/summoners/{sum.Server.ToString().ToLower()}/{sum.AccountName}").Result;
+                    using (var response = request.Content.ReadAsStreamAsync().Result)
+                    {
+                        var parser = new HtmlParser();
+                        var document = parser.ParseDocument(response);
+                        var divisions = document.QuerySelector("#content-container").FirstChild.ChildNodes;
 
-                    //not needed anymore
-                    //var unrankedCheck = Chrome.FindElements(By.CssSelector(".wrapper"));
-                    var divisions = Chrome.FindElements(By.CssSelector(".wrapper .info"));
-
-                    sum.SoloQ = divisions[0].FindElements(By.TagName("div"))[1].Text;
-                    sum.FlexQ = divisions[1].FindElements(By.TagName("div"))[1].Text;
+                        if (divisions[1].ChildNodes.Count() == 2)
+                            sum.SoloQ = divisions[1].LastChild.ChildNodes[1].FirstChild.TextContent.Trim();
+                        else { sum.SoloQ = "Unranked"; }
+                        sum.SoloQ = char.ToUpper(sum.SoloQ[0]) + sum.SoloQ.Substring(1);
+                        if (divisions[3].ChildNodes.Count() == 2)
+                            sum.FlexQ = divisions[3].LastChild.ChildNodes[1].FirstChild.TextContent.Trim();
+                        else { sum.FlexQ = "Unranked"; }
+                        sum.FlexQ = char.ToUpper(sum.FlexQ[0]) + sum.FlexQ.Substring(1);
+                    }
                 }
                 catch (Exception)
                 {
@@ -224,31 +218,22 @@ namespace LoginMacroWPF.Services
             {
                 try
                 {
-                    Chrome.Url = $"https://{sum.Server.ToString().ToLower()}.op.gg/summoners/{sum.Server.ToString().ToLower()}/{sum.AccountName}";
-                    Chrome.Navigate();
-
-                    //not needed anymore
-                    //var unrankedCheck = Chrome.FindElements(By.CssSelector(".wrapper"));
-                    var divisions = Chrome.FindElements(By.CssSelector("#content-container"))[0].FindElements(By.TagName("div"))[0].FindElements(By.XPath("./div"));
-
-                    if (divisions[0].FindElements(By.XPath("./div")).Count == 2)
+                    var httpClient = new HttpClient();
+                    var request = httpClient.GetAsync($"https://{sum.Server.ToString().ToLower()}.op.gg/summoners/{sum.Server.ToString().ToLower()}/{sum.AccountName.Split('#')[0]}-{sum.AccountTag}").Result;
+                    using (var response = request.Content.ReadAsStreamAsync().Result)
                     {
-                        /*
-                        string[] temp = divisions[0].FindElements(By.XPath("./div"))[1].FindElements(By.XPath("./div"))[1].Text.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
-                        sum.SoloQ = String.Join(" ", temp);
-                        */
-                        sum.SoloQ = divisions[0].FindElements(By.XPath("./div"))[1].FindElements(By.XPath("./div"))[1].FindElements(By.XPath("./div"))[0].Text.Trim();
+                        var parser = new HtmlParser();
+                        var document = parser.ParseDocument(response);
+                        var headers = document.QuerySelectorAll(".header");
+                        foreach (var division in headers)
+                        {
+                            if (division.TextContent == "Ranked Solo/Duo")
+                                sum.SoloQ = division.ParentElement.GetElementsByClassName("content").FirstOrDefault().GetElementsByClassName("info").FirstOrDefault().FirstChild.TextContent.Trim();
+                            else if (division.TextContent == "Ranked Flex")
+                                sum.FlexQ = division.ParentElement.GetElementsByClassName("content").FirstOrDefault().GetElementsByClassName("info").FirstOrDefault().FirstChild.TextContent.Trim();
+                        }
+
                     }
-                    else { sum.SoloQ = "Unranked"; }
-                    if (divisions[1].FindElements(By.XPath("./div")).Count == 2)
-                    {
-                        /*
-                        string[] temp = divisions[1].FindElements(By.XPath("./div"))[1].FindElements(By.XPath("./div"))[1].Text.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
-                        sum.FlexQ = String.Join(" ", temp);
-                        */
-                        sum.FlexQ = divisions[1].FindElements(By.XPath("./div"))[1].FindElements(By.XPath("./div"))[1].FindElements(By.XPath("./div"))[0].Text.Trim();
-                    }
-                    else { sum.FlexQ = "Unranked"; }
                 }
                 catch (Exception)
                 {
@@ -264,10 +249,16 @@ namespace LoginMacroWPF.Services
 
         } //for all summoners at once
 
-        public void DisposeOfChromedriver()
+        public Platforms GetNotEmptyPlatform()
         {
-            Chrome.Close();
-            Chrome.Dispose();
-        } //freeing up memory before closing the program
+            foreach (Platforms pf in Enum.GetValues(typeof(Platforms)))
+            {
+                if (Accounts.Select(acc => acc.Platform == pf).Count() != 0)
+                {
+                    return pf;
+                }
+            }
+            return default;
+        }
     }
 }

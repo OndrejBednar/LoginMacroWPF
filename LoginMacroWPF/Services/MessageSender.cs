@@ -35,7 +35,7 @@ namespace LoginMacroWPF.Services
         public static void Login(Summoner summoner, bool isError)
         {
             IntPtr ClientPtr;
-            ClientPtr = Process.GetProcessesByName("RiotClientUx").FirstOrDefault().MainWindowHandle;
+            ClientPtr = Process.GetProcessesByName("Riot Client").FirstOrDefault().MainWindowHandle;
             var rect = new Rect();
             GetWindowRect(ClientPtr, ref rect);
             SetForegroundWindow(ClientPtr);
@@ -43,9 +43,11 @@ namespace LoginMacroWPF.Services
             SetCursorPos((int)((rect.Right * 0.5) + (rect.Left * 0.5)), (int)((rect.Bottom * 0.3) + (rect.Top * 0.7)));
             DoMouseClick();
             SendKeys.SendWait("{TAB}");
+            SendKeys.SendWait("{TAB}");
+            SendKeys.SendWait("{TAB}");
+            SendKeys.SendWait("{TAB}");
             if (isError)
             {
-                SendKeys.SendWait("{TAB}");
                 SendKeys.SendWait("{TAB}");
             }
             SendKeys.SendWait($"{summoner.Username}");

@@ -1,4 +1,5 @@
 ﻿using LoginMacroWPF.Viewmodels;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,6 +17,19 @@ namespace LoginMacroWPF
             InitializeComponent();
 
             PlatformFrame.NavigationUIVisibility = System.Windows.Navigation.NavigationUIVisibility.Hidden;
+            switch (App.CredentialRW.GetNotEmptyPlatform())
+            {
+                case Models.Platforms.Lol:
+                    PlatformFrame.Navigate(new System.Uri("LeaguePage.xaml", System.UriKind.RelativeOrAbsolute));
+                    break;
+                case Models.Platforms.Steam:
+                    PlatformFrame.Navigate(new System.Uri("SteamPage.xaml", System.UriKind.RelativeOrAbsolute));
+                    break;
+                case Models.Platforms.BattleNet:
+                    break;
+                default:
+                    break;
+            }
             //if (RiotAPI.Api == null) InvalidApiKey.Visible = true;
         }
 

@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Controls;
 using UWPBindingCollection.ViewModels;
 using static LoginMacroWPF.PassManager;
 
@@ -21,7 +22,6 @@ namespace LoginMacroWPF.Viewmodels
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
         private string _username, _accName, _password;
         private List<Servers> _serverStrings = new List<Servers>();
         private int _selectedIndex = 1;
@@ -106,7 +106,7 @@ namespace LoginMacroWPF.Viewmodels
 
         public void SummonerSelected()
         {
-            AccName = SelectedSummoner.AccountName;
+            AccName = SelectedSummoner.AccountName + "#" + SelectedSummoner.AccountTag;
             Username = SelectedSummoner.Username;
             Password = Decrypt(SelectedSummoner.Password);
             SelectedIndex = (int)SelectedSummoner.Server;

@@ -19,10 +19,5 @@ namespace LoginMacroWPF.Models
         Ru = 8,
         Tr = 9,
         Jp = 10,
-        Global = 11,
-        Americas = 12,
-        Europe = 13,
-        Asia = 14,
-        NoRegion = 15
     }
 }

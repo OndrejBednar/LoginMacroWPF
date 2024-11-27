@@ -11,5 +11,6 @@ namespace LoginMacroWPF.Models
         Lol = 0,
         Steam = 1,
         BattleNet = 2,
+        
     }
 }
