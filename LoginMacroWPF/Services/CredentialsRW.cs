@@ -219,19 +219,38 @@ namespace LoginMacroWPF.Services
                 try
                 {
                     var httpClient = new HttpClient();
-                    var request = httpClient.GetAsync($"https://{sum.Server.ToString().ToLower()}.op.gg/summoners/{sum.Server.ToString().ToLower()}/{sum.AccountName.Split('#')[0]}-{sum.AccountTag}").Result;
+                    var httpRequest = new HttpRequestMessage();
+                    httpRequest.Method = HttpMethod.Get;
+                    httpRequest.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:55.0) Gecko/20100101 Firefox/55.0");
+                    httpRequest.RequestUri = new Uri($"https://{sum.Server.ToString().ToLower()}.op.gg/summoners/{sum.Server.ToString().ToLower()}/{sum.AccountName.Split('#')[0]}-{sum.AccountTag}");
+                    var request = httpClient.Send(httpRequest);
+                    //var request = httpClient.GetAsync($"https://{sum.Server.ToString().ToLower()}.op.gg/summoners/{sum.Server.ToString().ToLower()}/{sum.AccountName.Split('#')[0]}-{sum.AccountTag}").Result;
                     using (var response = request.Content.ReadAsStreamAsync().Result)
                     {
                         var parser = new HtmlParser();
                         var document = parser.ParseDocument(response);
+
+                        if (document.GetElementsByTagName("h1")[0].TextContent.Contains("No search results"))
+                        {
+                            checkErrors += sum.AccountName + Environment.NewLine;
+                            sum.SoloQ = "Error";
+                            sum.FlexQ = "Error";
+                            continue;
+                        }
+
                         var headers = document.QuerySelectorAll(".header");
                         foreach (var division in headers)
                         {
                             if (division.TextContent == "Ranked Solo/Duo")
-                                sum.SoloQ = division.ParentElement.GetElementsByClassName("content").FirstOrDefault().GetElementsByClassName("info").FirstOrDefault().FirstChild.TextContent.Trim();
+                                sum.SoloQ = char.ToUpper(division.ParentElement.GetElementsByClassName("content").FirstOrDefault().GetElementsByClassName("info").FirstOrDefault().FirstChild.TextContent.Trim()[0]) + division.ParentElement.GetElementsByClassName("content").FirstOrDefault().GetElementsByClassName("info").FirstOrDefault().FirstChild.TextContent.Trim().Split(' ')[1];
                             else if (division.TextContent == "Ranked Flex")
-                                sum.FlexQ = division.ParentElement.GetElementsByClassName("content").FirstOrDefault().GetElementsByClassName("info").FirstOrDefault().FirstChild.TextContent.Trim();
+                                sum.FlexQ = char.ToUpper(division.ParentElement.GetElementsByClassName("content").FirstOrDefault().GetElementsByClassName("info").FirstOrDefault().FirstChild.TextContent.Trim()[0]) + division.ParentElement.GetElementsByClassName("content").FirstOrDefault().GetElementsByClassName("info").FirstOrDefault().FirstChild.TextContent.Trim().Split(' ')[1];
                         }
+
+                        if(sum.SoloQ == "")
+                            sum.SoloQ = "Unranked";
+                        if(sum.FlexQ == "")
+                            sum.FlexQ = "Unranked";
 
                     }
                 }
